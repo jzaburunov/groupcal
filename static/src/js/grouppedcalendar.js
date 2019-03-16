@@ -1,4 +1,4 @@
-odoo.define('depyl_cal.GrouppedCalendar', function(require){
+odoo.define('groupcal.GrouppedCalendar', function(require){
     "use strict";
 
     /*---------------------------------------------------------
