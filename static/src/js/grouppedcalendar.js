@@ -142,8 +142,8 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
             this.date_delay = attrs.date_delay;     // duration
             this.date_stop = attrs.date_stop;
             this.all_day = attrs.all_day;
-            // TODO
-            // this.resource_id = attrs.resource_id;
+            this.resource_model = attrs.resource_model;
+            this.resource_id = attrs.resource_id;
             this.how_display_event = '';
             this.attendee_people = attrs.attendee;
 
@@ -160,6 +160,11 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
             if (!isNullOrUndef(attrs.display)) {
                 this.how_display_event = attrs.display; // String with [FIELD]
             }
+
+            if (!isNullOrUndef(attrs.time_format)) {
+              this.time_format = attrs.time_format; // String with timeformat for event header
+            }
+
 
             // If this field is set ot true, we don't open the event in form view, but in a popup with the view_id passed by this parameter
             if (isNullOrUndef(attrs.event_open_popup) || !utils.toBoolElse(attrs.event_open_popup, true)) {
@@ -309,15 +314,28 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
         get_fc_init_options: function () {
             //Documentation here : http://arshaw.com/fullcalendar/docs/
             var self = this;
+            var defaultView = this.mode;
+            if (this.mode == "month") {
+                defaultView = "month";
+            }
+            if ((this.mode == "week")){
+                defaultView = "agendaWeek";
+            }
+            if (this.mode == "day"){ 
+                defaultView = "agendaDay";
+            }
+            if (!this.mode) {
+                defaultView = "agendaDay";
+            }
             return $.extend({}, get_fc_defaultOptions(), {
-                //defaultView: (this.mode == "month")? "month" : ((this.mode == "week")? "agendaWeek" : ((this.mode == "day")? "agendaDay" : "agendaWeek")),
-                defaultView: 'agendaDay',
+                defaultView: defaultView,
                 schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
                 header: true,
                 selectable: !this.options.read_only_mode && this.create_right,
                 selectHelper: true,
                 editable: this.editable,
                 droppable: true,
+                timeFormat: this.time_format,
                 views: {
                   agendaDay : {
                           // views that are more than a day will NOT do this behavior by default
@@ -329,7 +347,18 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
 
                 // callbacks
                 viewRender: function(view) {
-                    var mode = (view.name == "month")? "month" : ((view.name == "agendaWeek") ? "week" : "day");
+                    var mode;
+                    if (view.name == "month") {
+                        mode = "month";
+                    }
+                    else if (
+                        view.name == "agendaWeek" ||
+                        view.name == "basicWeek"
+                        ) {
+                        mode = "week";
+                    } else {
+                        mode = "day";
+                    }
                     if(self.$buttons !== undefined) {
                         self.$buttons.find('.active').removeClass('active');
                         self.$buttons.find('.o_calendar_button_' + mode).addClass('active');
@@ -338,7 +367,11 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
                     var title = self.title + ' (' + ((mode === "week")? _t("Week ") : "") + view.title + ")";
                     self.set({'title': title});
 
-                    self.$calendar.fullCalendar2('option', 'height', Math.max(290, parseInt(self.$('.o_calendar_view').height())));
+                    self.$calendar.fullCalendar2(
+                        'option',
+                        'height',
+                        Math.max(580, parseInt(self.$('.o_calendar_view').height()))
+                    );
 
                     setTimeout(function() {
                         var $fc_view = self.$calendar.find('.fc-view');
@@ -404,15 +437,20 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
                 }
                 // TODO migrate fc2
                 // WTF Occasionaly lost 1 day
-                context.$calendar.fullCalendar2('gotoDate', moment(curDate).add(1, 'day'));
+                context.$calendar.fullCalendar2('gotoDate', moment(curDate));
             };
+        },
+
+        get_sidebar_class() {
+            return widgets.Sidebar;
         },
 
         init_calendar: function() {
             var defs = [];
             if (!this.sidebar) {
                 var translate = get_fc_defaultOptions();
-                this.sidebar = new widgets.Sidebar(this);
+                var Sidebar = this.get_sidebar_class();
+                this.sidebar = new Sidebar(this);
                 defs.push(this.sidebar.appendTo(this.$sidebar_container));
 
                 this.$small_calendar = this.$(".o_calendar_mini");
@@ -447,7 +485,7 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
             var QuickCreate = this.get_quick_create_class();
 
             this.options.disable_quick_create =  this.options.disable_quick_create || !this.quick_add_pop;
-            this.quick = new QuickCreate(this, this.dataset, true, this.options, data_template);
+            this.quick = new QuickCreate(this, this.dataset, true, this.options, data_template, this);
             this.quick.on('added', this, this.quick_created)
                     .on('slowadded', this, this.slow_created)
                     .on('closed', this, function() {
@@ -497,7 +535,12 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
                         // By forcing attribution of this event to this source, we
                         // make sure that the event will be removed when the source
                         // will be removed (which occurs at each do_search)
-                        self.$calendar.fullCalendar2('clientEvents', id)[0].source = self.event_source;
+                        var clientEvents = self.$calendar.fullCalendar2(
+                          'clientEvents', id
+                        );
+                        if (clientEvents && clientEvents.length) {
+                          clientEvents[0].source = self.event_source;
+                        }
                     }
                 });
             });
@@ -576,8 +619,9 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
                 attendees = [];
 
             if (!all_day) {
-                date_start = time.auto_str_to_date(evt[this.date_start]);
-                date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop]) : null;
+                date_start = moment(evt[this.date_start]).toDate();//time.auto_str_to_date(evt[this.date_start]);
+                // date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop]) : null;
+                date_stop = this.date_stop ? moment(evt[this.date_stop]).toDate() : null;
             } else {
                 date_start = time.auto_str_to_date(evt[this.date_start].split(' ')[0],'start');
                 date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop].split(' ')[0],'start') : null;
@@ -765,8 +809,7 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
             }
 
             // ATTENTION can be undefined
-            // TODO use this.resource_id field passed from xml!
-            data['chair_id'] = event.resourceId;
+            data[this.resource_id] = event.resourceId;
             return data;
         },
 
@@ -857,7 +900,7 @@ odoo.define('depyl_cal.GrouppedCalendar', function(require){
                                 if (!self.all_filters[key]) {
                                     filter_item = {
                                         value: key,
-                                        label: val[1],
+                                        label: val ? val[1]: '',
                                         color: self.get_color(key),
                                         avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
                                         is_checked: true
