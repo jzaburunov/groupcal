@@ -5,6 +5,7 @@
       <xpath expr="." position="inside">
         <link rel="stylesheet" href="/groupcal/static/lib/fc/css/fullcalendar.min.css"></link>
         <link rel="stylesheet" href="/groupcal/static/lib/fc/css/scheduler.min.css"></link>
+        <link rel="stylesheet" href="/groupcal/static/src/less/web_calendar.less"/>
         <script type="text/javascript" src="/groupcal/static/lib/fc/js/fullcalendar-2.5.0.js"></script>
         <script type="text/javascript" src="/groupcal/static/lib/fc/js/scheduler-1.1.0.js"></script>
         <script type="text/javascript" src="/groupcal/static/src/js/grouppedcalendar.js"></script>
