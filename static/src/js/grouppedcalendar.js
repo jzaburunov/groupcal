@@ -813,6 +813,11 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             return data;
         },
 
+
+        check_filter: function(key) {
+            return true;
+        },
+        
         do_search: function (domain, context, _group_by) {
             var self = this;
             this.shown.done(function () {
@@ -903,7 +908,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                                         label: val ? val[1]: '',
                                         color: self.get_color(key),
                                         avatar_model: (utils.toBoolElse(self.avatar_filter, true) ? self.avatar_filter : false ),
-                                        is_checked: true
+                                        is_checked: self.check_filter(key)
                                     };
                                     self.all_filters[key] = filter_item;
                                 }
