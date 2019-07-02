@@ -303,7 +303,7 @@ function getScrollParent(el) {
 			);
 		}).eq(0);
 
-	return position === 'fixed' || !scrollParent.length ? $(el[0].ownerDocument || document) : scrollParent;
+		return position === 'fixed' || !scrollParent.length ? $(el[0] && el[0].ownerDocument || document) : scrollParent;
 }
 
 
