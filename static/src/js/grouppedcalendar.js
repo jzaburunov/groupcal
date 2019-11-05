@@ -329,6 +329,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             }
             return $.extend({}, get_fc_defaultOptions(), {
                 defaultView: defaultView,
+                refetchResourcesOnNavigate: true,
                 schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
                 header: true,
                 selectable: !this.options.read_only_mode && this.create_right,
