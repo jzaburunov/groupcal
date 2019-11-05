@@ -12,3 +12,18 @@
   padding-bottom: 0 !important;
   min-height: 34px;
 }
+
+/* next 2 rules have Same purpose :
+To set events position on the top in timeline view */
+/* Place it here because of order of loading css */
+.o_calendar_container 
+.o_calendar_view 
+.o_calendar_widget * {
+  z-index: inherit !important;
+}
+
+.o_calendar_container 
+.o_calendar_view 
+.o_calendar_widget .fc-event {
+  z-index: 1 !important;
+}
