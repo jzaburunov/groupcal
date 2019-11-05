@@ -12371,8 +12371,8 @@ __webpack_require__(255);
 __webpack_require__(256);
 __webpack_require__(257);
 __webpack_require__(258);
-$.fullCalendar = exportHooks;
-$.fn.fullCalendar = function (options) {
+$.fullCalendar3 = exportHooks;
+$.fn.fullCalendar3 = function (options) {
     var args = Array.prototype.slice.call(arguments, 1); // for a possible method call
     var res = this; // what this function will return (this jQuery object by default)
     this.each(function (i, _element) {

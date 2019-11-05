@@ -65,7 +65,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             monthNamesShort: moment.monthsShort(),
             dayNames: moment.weekdays(),
             dayNamesShort: moment.weekdaysShort(),
-            firstDay: moment._locale._week.dow,
+            // firstDay: moment._locale._week.dow,
             // TODO migrate fc 2
             // weekNumberCalculation: function(date) {
             //     return moment(date).week();
@@ -75,11 +75,11 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             // http://fullcalendar.io/docs1/text/timeFormat/
             timeFormat: timeFormat + ' {- ' + timeFormat + '}',
             weekNumbers: true,
-            titleFormat: {
-                month: 'MMMM YYYY',
-                week: "w",
-                day: dateFormat,
-            },
+            // titleFormat: {
+            //     month: 'MMMM YYYY',
+            //     week: "w",
+            //     day: dateFormat,
+            // },
             columnFormat: {
                 month: 'ddd',
                 week: 'ddd ' + dateFormat,
@@ -380,7 +380,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     }, 0);
                 },
                 windowResize: function() {
-                    self.$calendar.fullCalendar2('render');
+                    self.$calendar.fullCalendar3('render');
                 },
                 // TODO migrate fc2
                 eventDrop: function (event, _delta, _revertFunc) { //_day_delta, _minute_delta, _all_day, _revertFunc) {
@@ -467,7 +467,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                 this.$sidebar_container.append($('<i>').addClass('o_calendar_sidebar_toggler fa'));
                 this.toggle_sidebar((local_storage.getItem('web_calendar_full_width') !== 'true'));
             }
-            this.$calendar.fullCalendar2(this.get_fc_init_options());
+            this.$calendar.fullCalendar3(this.get_fc_init_options());
 
             return $.when.apply($, defs);
         },
@@ -955,7 +955,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     return self.event_data_transform(event);
                 },
             };
-            this.$calendar.fullCalendar2('addEventSource', this.event_source);
+            this.$calendar.fullCalendar3('addEventSource', this.event_source);
         },
         /**
          * Build OpenERP Domain to filter object by this.date_start field
