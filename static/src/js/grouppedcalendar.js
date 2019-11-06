@@ -42,7 +42,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
 
         // adapt format for fullcalendar v1.
         // see http://fullcalendar.io/docs1/utilities/formatDate/
-        // TODO migrate fc 2
+        // migrate fc 2
         // var conversions = [['YYYY', 'yyyy'], ['YY', 'y'], ['DDDD', 'dddd'], ['DD', 'dd']];
         // _.each(conversions, function(conv) {
         //     dateFormat = dateFormat.replace(conv[0], conv[1]);
@@ -51,7 +51,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
         // If 'H' is contained in timeFormat display '10:00'
         // Else display '10 AM'.
         // See : http://fullcalendar.io/docs1/utilities/formatDate/
-        // TODO migrate fc 2
+        // migrate fc 2
         var hourFormat = function(timeFormat){
             if (/H/.test(timeFormat))
                 return 'HH:mm';
@@ -65,8 +65,8 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             monthNamesShort: moment.monthsShort(),
             dayNames: moment.weekdays(),
             dayNamesShort: moment.weekdaysShort(),
-            firstDay: moment._locale._week.dow,
-            // TODO migrate fc 2
+            // firstDay: moment._locale._week.dow,
+            // migrate fc 2
             // weekNumberCalculation: function(date) {
             //     return moment(date).week();
             // },
@@ -75,18 +75,13 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             // http://fullcalendar.io/docs1/text/timeFormat/
             timeFormat: timeFormat + ' {- ' + timeFormat + '}',
             weekNumbers: true,
-            titleFormat: {
-                month: 'MMMM YYYY',
-                week: "w",
-                day: dateFormat,
-            },
             columnFormat: {
                 month: 'ddd',
                 week: 'ddd ' + dateFormat,
                 day: 'dddd ' + dateFormat,
             },
             weekMode : 'liquid',
-            // TODO migrate fc 2
+            // migrate fc 2
             snapDuration: {minutes: 15},
         };
     }
@@ -102,7 +97,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
     var CalendarView2 = View.extend({
         custom_events: {
             reload_events: function () {
-                this.$calendar.fullCalendar2('refetchEvents');
+                this.$calendar.fullCalendar3('refetchEvents');
             },
         },
         defaults: _.extend({}, View.prototype.defaults, {
@@ -250,7 +245,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
         },
         destroy: function() {
             if (this.$calendar) {
-                this.$calendar.fullCalendar2('destroy');
+                this.$calendar.fullCalendar3('destroy');
             }
             if (this.$small_calendar) {
                 this.$small_calendar.datepicker('destroy');
@@ -280,7 +275,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             });
 
             var bindCalendarButton = function(selector, arg1, arg2) {
-                self.$buttons.on('click', selector, _.bind(self.$calendar.fullCalendar2, self.$calendar, arg1, arg2));
+                self.$buttons.on('click', selector, _.bind(self.$calendar.fullCalendar3, self.$calendar, arg1, arg2));
             };
             bindCalendarButton('.o_calendar_button_prev', 'prev');
             bindCalendarButton('.o_calendar_button_today', 'today');
@@ -301,7 +296,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             var full_width = (local_storage.getItem('web_calendar_full_width') !== 'true');
             local_storage.setItem('web_calendar_full_width', full_width);
             this.toggle_sidebar(!full_width);
-            this.$calendar.fullCalendar2('render'); // to reposition the events
+            this.$calendar.fullCalendar3('render'); // to reposition the events
         },
         toggle_sidebar: function (display) {
             this.sidebar.do_toggle(display);
@@ -329,6 +324,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             }
             return $.extend({}, get_fc_defaultOptions(), {
                 defaultView: defaultView,
+                refetchResourcesOnNavigate: true,
                 schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
                 header: true,
                 selectable: !this.options.read_only_mode && this.create_right,
@@ -367,7 +363,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     var title = self.title + ' (' + ((mode === "week")? _t("Week ") : "") + view.title + ")";
                     self.set({'title': title});
 
-                    self.$calendar.fullCalendar2(
+                    self.$calendar.fullCalendar3(
                         'option',
                         'height',
                         Math.max(580, parseInt(self.$('.o_calendar_view').height()))
@@ -380,22 +376,22 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     }, 0);
                 },
                 windowResize: function() {
-                    self.$calendar.fullCalendar2('render');
+                    self.$calendar.fullCalendar3('render');
                 },
-                // TODO migrate fc2
+                // migrate fc2
                 eventDrop: function (event, _delta, _revertFunc) { //_day_delta, _minute_delta, _all_day, _revertFunc) {
                     var data = self.get_event_data(event);
-                    self.proxy('update_record')(event._id, data); // we don't revert the event, but update it.
+                    self.proxy('update_record')(event.id, data); // we don't revert the event, but update it.
                 },
                 eventResize: function (event, _day_delta, _minute_delta, _revertFunc) {
                     var data = self.get_event_data(event);
-                    self.proxy('update_record')(event._id, data);
+                    self.proxy('update_record')(event.id, data);
                 },
                 eventRender: function (event, element, view) {
                     element.find('.fc-event-title').html(event.title + event.attendee_avatars);
                 },
                 eventAfterRender: function (event, element, view) {
-                    // TODO migrate fc2 .start, .end
+                    // migrate fc2 .start, .end
                     if ((view.name !== 'month') && (((event.end-event.start)/60000)<=30)) {
                         //if duration is too small, we see the html code of img
                         var current_title = $(element.find('.fc-event-time')).text();
@@ -403,10 +399,9 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                         element.find('.fc-event-time').html(new_title);
                     }
                 },
-                eventClick: function (event) { self.open_event(event._id,event.title); },
-                // TODO migrate fc2
+                eventClick: function (event) { self.open_event(event.id,event.title); },
+                // migrate fc2
                 select: function (start_date, end_date, _js_event, _view, resource) {
-                    // TODO
                     var all_day = false;
                     console.log('ATTENTION not migrated function works');
                     var data_template = self.get_event_data({
@@ -424,20 +419,20 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
 
         calendarMiniChanged: function (context) {
             return function(datum,obj) {
-                var curView = context.$calendar.fullCalendar2('getView');
+                var curView = context.$calendar.fullCalendar3('getView');
                 var curDate = new Date(obj.currentYear , obj.currentMonth, obj.currentDay);
 
                 if (curView.name == "agendaWeek") {
                     if (curDate <= curView.end && curDate >= curView.start) {
-                        context.$calendar.fullCalendar2('changeView','agendaDay');
+                        context.$calendar.fullCalendar3('changeView','agendaDay');
                     }
                 }
                 else if (curView.name != "agendaDay" || (curView.name == "agendaDay" && moment(curDate).diff(moment(curView.start))===0)) {
-                    context.$calendar.fullCalendar2('changeView','agendaWeek');
+                    context.$calendar.fullCalendar3('changeView','agendaWeek');
                 }
-                // TODO migrate fc2
+                // migrate fc2
                 // WTF Occasionaly lost 1 day
-                context.$calendar.fullCalendar2('gotoDate', moment(curDate));
+                context.$calendar.fullCalendar3('gotoDate', moment(curDate));
             };
         },
 
@@ -467,7 +462,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                 this.$sidebar_container.append($('<i>').addClass('o_calendar_sidebar_toggler fa'));
                 this.toggle_sidebar((local_storage.getItem('web_calendar_full_width') !== 'true'));
             }
-            this.$calendar.fullCalendar2(this.get_fc_init_options());
+            this.$calendar.fullCalendar3(this.get_fc_init_options());
 
             return $.when.apply($, defs);
         },
@@ -490,7 +485,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     .on('slowadded', this, this.slow_created)
                     .on('closed', this, function() {
                         delete this.quick;
-                        this.$calendar.fullCalendar2('unselect');
+                        this.$calendar.fullCalendar3('unselect');
                     });
 
             if(!this.options.disable_quick_create) {
@@ -518,24 +513,24 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     // Event boundaries were already changed by fullcalendar, but we need to reload them:
                     var new_event = self.event_data_transform(records[0]);
                     // fetch event_obj
-                    var event_objs = self.$calendar.fullCalendar2('clientEvents', id);
+                    var event_objs = self.$calendar.fullCalendar3('clientEvents', id);
                     if (event_objs.length == 1) { // Already existing obj to update
                         var event_obj = event_objs[0];
                         // update event_obj
                         _(new_event).each(function (value, key) {
                             event_obj[key] = value;
                         });
-                        self.$calendar.fullCalendar2('updateEvent', event_obj);
+                        self.$calendar.fullCalendar3('updateEvent', event_obj);
                     } else { // New event object to create
                         var $fc_view = self.$calendar.find('.fc-view');
                         var scrollPosition = $fc_view.scrollLeft();
                         $fc_view.scrollLeft(0);
-                        self.$calendar.fullCalendar2('renderEvent', new_event);
+                        self.$calendar.fullCalendar3('renderEvent', new_event);
                         $fc_view.scrollLeft(scrollPosition);
                         // By forcing attribution of this event to this source, we
                         // make sure that the event will be removed when the source
                         // will be removed (which occurs at each do_search)
-                        var clientEvents = self.$calendar.fullCalendar2(
+                        var clientEvents = self.$calendar.fullCalendar3(
                           'clientEvents', id
                         );
                         if (clientEvents && clientEvents.length) {
@@ -759,11 +754,11 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             var data = {
                 name: event.title
             };
-            // TODO migrate fc 2 .end
+            // migrate fc 2 .end
             var event_end = event.end;
             //Bug when we move an all_day event from week or day view, we don't have a dateend or duration...
             if (event_end === null) {
-                // TODO migrate fc2 .start
+                // migrate fc2 .start
                 // var m_date = moment(event.start).add(2, 'hours');
                 event_end = event.start.clone().add(2, 'hours');
             }
@@ -771,16 +766,16 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             if (event.allDay) {
                 // Sometimes fullcalendar doesn't give any event.end.
                 if (event_end === null || _.isUndefined(event_end)) {
-                    // TODO migrate fc2 .start
+                    // migrate fc2 .start
                     event_end = event.start;
                 }
                 if (this.all_day) {
-                    // TODO migrate fc2 .start, .getDate
+                    // migrate fc2 .start, .getDate
                     date_start_day = new Date(Date.UTC(event.start.year(),event.start.month(),event.start.date()));
                     date_stop_day = new Date(Date.UTC(event_end.year(),event_end.month(),event_end.date()));
                 }
                 else {
-                    // TODO migrate fc2 .start, .getDate
+                    // migrate fc2 .start, .getDate
                     date_start_day = new Date(event.start.year(),event.start.month(),event.start.date(),7);
                     date_stop_day = new Date(event_end.year(),event_end.month(),event_end.date(),19);
                 }
@@ -792,7 +787,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
 
             }
             else {
-                // TODO migrate fc2 .start
+                // migrate fc2 .start
                 data[this.date_start] = time.auto_date_to_str(event.start.toDate(), this.fields[this.date_start].type);
                 if (this.date_stop) {
                     data[this.date_stop] = time.auto_date_to_str(event_end.toDate(), this.fields[this.date_stop].type);
@@ -831,10 +826,10 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             }
 
             if (! _.isUndefined(this.event_source)) {
-                this.$calendar.fullCalendar2('removeEventSource', this.event_source);
+                this.$calendar.fullCalendar3('removeEventSource', this.event_source);
             }
             this.event_source = {
-                // TODO migrate fc2
+                // migrate fc2
                 events: function(start, end, tz, callback) {
                     console.log('ATTENTION not migrated function works');
                     // catch invalid dates (start/end dates not parseable yet)
@@ -955,7 +950,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     return self.event_data_transform(event);
                 },
             };
-            this.$calendar.fullCalendar2('addEventSource', this.event_source);
+            this.$calendar.fullCalendar3('addEventSource', this.event_source);
         },
         /**
          * Build OpenERP Domain to filter object by this.date_start field
@@ -997,7 +992,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     if (is_virtual_id(event_id)) {
                         // this is a virtual ID and so this will create a new event
                         // with an unknown id for us.
-                        self.$calendar.fullCalendar2('refetchEvents');
+                        self.$calendar.fullCalendar3('refetchEvents');
                     } else {
                         // classical event that we can refresh
                         self.refresh_event(event_id);
@@ -1079,14 +1074,14 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                 // force filter refresh
                 self.sidebar.filter.is_loaded = false;
             }
-            self.$calendar.fullCalendar2('refetchEvents');
+            self.$calendar.fullCalendar3('refetchEvents');
         },
 
         remove_event: function(id) {
             var self = this;
             function do_it() {
                 return $.when(self.dataset.unlink([id])).then(function() {
-                    self.$calendar.fullCalendar2('removeEvents', id);
+                    self.$calendar.fullCalendar3('removeEvents', id);
                 });
             }
             if (this.options.confirm_on_delete) {
