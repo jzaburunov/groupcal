@@ -42,7 +42,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
 
         // adapt format for fullcalendar v1.
         // see http://fullcalendar.io/docs1/utilities/formatDate/
-        // TODO migrate fc 2
+        // migrate fc 2
         // var conversions = [['YYYY', 'yyyy'], ['YY', 'y'], ['DDDD', 'dddd'], ['DD', 'dd']];
         // _.each(conversions, function(conv) {
         //     dateFormat = dateFormat.replace(conv[0], conv[1]);
@@ -51,7 +51,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
         // If 'H' is contained in timeFormat display '10:00'
         // Else display '10 AM'.
         // See : http://fullcalendar.io/docs1/utilities/formatDate/
-        // TODO migrate fc 2
+        // migrate fc 2
         var hourFormat = function(timeFormat){
             if (/H/.test(timeFormat))
                 return 'HH:mm';
@@ -66,7 +66,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             dayNames: moment.weekdays(),
             dayNamesShort: moment.weekdaysShort(),
             // firstDay: moment._locale._week.dow,
-            // TODO migrate fc 2
+            // migrate fc 2
             // weekNumberCalculation: function(date) {
             //     return moment(date).week();
             // },
@@ -75,18 +75,13 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             // http://fullcalendar.io/docs1/text/timeFormat/
             timeFormat: timeFormat + ' {- ' + timeFormat + '}',
             weekNumbers: true,
-            // titleFormat: {
-            //     month: 'MMMM YYYY',
-            //     week: "w",
-            //     day: dateFormat,
-            // },
             columnFormat: {
                 month: 'ddd',
                 week: 'ddd ' + dateFormat,
                 day: 'dddd ' + dateFormat,
             },
             weekMode : 'liquid',
-            // TODO migrate fc 2
+            // migrate fc 2
             snapDuration: {minutes: 15},
         };
     }
@@ -383,7 +378,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                 windowResize: function() {
                     self.$calendar.fullCalendar3('render');
                 },
-                // TODO migrate fc2
+                // migrate fc2
                 eventDrop: function (event, _delta, _revertFunc) { //_day_delta, _minute_delta, _all_day, _revertFunc) {
                     var data = self.get_event_data(event);
                     self.proxy('update_record')(event.id, data); // we don't revert the event, but update it.
@@ -396,7 +391,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     element.find('.fc-event-title').html(event.title + event.attendee_avatars);
                 },
                 eventAfterRender: function (event, element, view) {
-                    // TODO migrate fc2 .start, .end
+                    // migrate fc2 .start, .end
                     if ((view.name !== 'month') && (((event.end-event.start)/60000)<=30)) {
                         //if duration is too small, we see the html code of img
                         var current_title = $(element.find('.fc-event-time')).text();
@@ -405,9 +400,8 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                     }
                 },
                 eventClick: function (event) { self.open_event(event.id,event.title); },
-                // TODO migrate fc2
+                // migrate fc2
                 select: function (start_date, end_date, _js_event, _view, resource) {
-                    // TODO
                     var all_day = false;
                     console.log('ATTENTION not migrated function works');
                     var data_template = self.get_event_data({
@@ -436,7 +430,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                 else if (curView.name != "agendaDay" || (curView.name == "agendaDay" && moment(curDate).diff(moment(curView.start))===0)) {
                     context.$calendar.fullCalendar3('changeView','agendaWeek');
                 }
-                // TODO migrate fc2
+                // migrate fc2
                 // WTF Occasionaly lost 1 day
                 context.$calendar.fullCalendar3('gotoDate', moment(curDate));
             };
@@ -760,11 +754,11 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             var data = {
                 name: event.title
             };
-            // TODO migrate fc 2 .end
+            // migrate fc 2 .end
             var event_end = event.end;
             //Bug when we move an all_day event from week or day view, we don't have a dateend or duration...
             if (event_end === null) {
-                // TODO migrate fc2 .start
+                // migrate fc2 .start
                 // var m_date = moment(event.start).add(2, 'hours');
                 event_end = event.start.clone().add(2, 'hours');
             }
@@ -772,16 +766,16 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             if (event.allDay) {
                 // Sometimes fullcalendar doesn't give any event.end.
                 if (event_end === null || _.isUndefined(event_end)) {
-                    // TODO migrate fc2 .start
+                    // migrate fc2 .start
                     event_end = event.start;
                 }
                 if (this.all_day) {
-                    // TODO migrate fc2 .start, .getDate
+                    // migrate fc2 .start, .getDate
                     date_start_day = new Date(Date.UTC(event.start.year(),event.start.month(),event.start.date()));
                     date_stop_day = new Date(Date.UTC(event_end.year(),event_end.month(),event_end.date()));
                 }
                 else {
-                    // TODO migrate fc2 .start, .getDate
+                    // migrate fc2 .start, .getDate
                     date_start_day = new Date(event.start.year(),event.start.month(),event.start.date(),7);
                     date_stop_day = new Date(event_end.year(),event_end.month(),event_end.date(),19);
                 }
@@ -793,7 +787,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
 
             }
             else {
-                // TODO migrate fc2 .start
+                // migrate fc2 .start
                 data[this.date_start] = time.auto_date_to_str(event.start.toDate(), this.fields[this.date_start].type);
                 if (this.date_stop) {
                     data[this.date_stop] = time.auto_date_to_str(event_end.toDate(), this.fields[this.date_stop].type);
@@ -835,7 +829,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                 this.$calendar.fullCalendar3('removeEventSource', this.event_source);
             }
             this.event_source = {
-                // TODO migrate fc2
+                // migrate fc2
                 events: function(start, end, tz, callback) {
                     console.log('ATTENTION not migrated function works');
                     // catch invalid dates (start/end dates not parseable yet)
