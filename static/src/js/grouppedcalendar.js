@@ -65,7 +65,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
             monthNamesShort: moment.monthsShort(),
             dayNames: moment.weekdays(),
             dayNamesShort: moment.weekdaysShort(),
-            // firstDay: moment._locale._week.dow,
+            firstDay: 1,
             // migrate fc 2
             // weekNumberCalculation: function(date) {
             //     return moment(date).week();
