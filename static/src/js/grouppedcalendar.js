@@ -386,11 +386,11 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                 // TODO migrate fc2
                 eventDrop: function (event, _delta, _revertFunc) { //_day_delta, _minute_delta, _all_day, _revertFunc) {
                     var data = self.get_event_data(event);
-                    self.proxy('update_record')(event._id, data); // we don't revert the event, but update it.
+                    self.proxy('update_record')(event.id, data); // we don't revert the event, but update it.
                 },
                 eventResize: function (event, _day_delta, _minute_delta, _revertFunc) {
                     var data = self.get_event_data(event);
-                    self.proxy('update_record')(event._id, data);
+                    self.proxy('update_record')(event.id, data);
                 },
                 eventRender: function (event, element, view) {
                     element.find('.fc-event-title').html(event.title + event.attendee_avatars);
@@ -404,7 +404,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                         element.find('.fc-event-time').html(new_title);
                     }
                 },
-                eventClick: function (event) { self.open_event(event._id,event.title); },
+                eventClick: function (event) { self.open_event(event.id,event.title); },
                 // TODO migrate fc2
                 select: function (start_date, end_date, _js_event, _view, resource) {
                     // TODO
