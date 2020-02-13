@@ -614,9 +614,9 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
                 attendees = [];
 
             if (!all_day) {
-                date_start = moment(evt[this.date_start]).toDate();//time.auto_str_to_date(evt[this.date_start]);
+                date_start = moment(evt[this.date_start], "YYYY-MM-DD HH:mm:ss Z").toDate();//time.auto_str_to_date(evt[this.date_start]);
                 // date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop]) : null;
-                date_stop = this.date_stop ? moment(evt[this.date_stop]).toDate() : null;
+                date_stop = this.date_stop ? moment(evt[this.date_stop], "YYYY-MM-DD HH:mm:ss Z").toDate() : null;
             } else {
                 date_start = time.auto_str_to_date(evt[this.date_start].split(' ')[0],'start');
                 date_stop = this.date_stop ? time.auto_str_to_date(evt[this.date_stop].split(' ')[0],'start') : null;
