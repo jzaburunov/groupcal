@@ -25,6 +25,9 @@
     'data': [
         'calendar.xml',
     ],
+    'qweb': [
+        'static/src/xml/*.xml',
+    ],
 
     'application': True,
 }

@@ -109,7 +109,7 @@ odoo.define('groupcal.GrouppedCalendar', function(require){
         },
         icon: 'fa-calendar',
         quick_create_instance: widgets.QuickCreate,
-        template: "CalendarView",
+        template: "CalendarViewIrresponsive",
 
         init: function () {
             this._super.apply(this, arguments);

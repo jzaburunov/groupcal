@@ -1,0 +1,10 @@
+
+<template>
+    <div t-name="CalendarViewIrresponsive" class="o_calendar_container">
+        <div class="o_calendar_view">
+            <div class="o_calendar_buttons"/>
+            <div class="o_calendar_widget" />
+        </div>
+        <div class="o_calendar_sidebar_container"/>
+    </div>
+</template>
